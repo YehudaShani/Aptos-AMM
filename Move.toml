@@ -1,0 +1,14 @@
+[package]
+name = "aptos_test"
+version = "0.0.0"
+
+[addresses]
+hello_blockchain = "_"
+
+[dev-addresses]
+hello_blockchain = "0xb1c6f4d620cd47adc541e75285b76b09a3f87bd579cac3ec79f10b1eb9ef1f35"
+
+[dependencies.AptosFramework]
+git = "https://github.com/aptos-labs/aptos-framework.git"
+rev = "mainnet"
+subdir = "aptos-framework"
