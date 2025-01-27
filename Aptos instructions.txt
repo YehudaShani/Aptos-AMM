@@ -1,0 +1,149 @@
+========================================
+APTOS REFERENCE GUIDE
+========================================
+
+1) INIT & CONFIGURE WALLET
+--------------------------
+- Command:
+    aptos init
+- Explanation:
+    Initializes your Aptos CLI configuration. Stores keys and network settings in ~/.aptos/config.yaml.
+
+2) CHECK CURRENT ACCOUNT BALANCE
+-------------------------------
+- Command:
+    aptos account balance
+- Explanation:
+    Shows the details of the default account (address, public key, sequence number).
+- To specify a named profile:
+    aptos account show --profile <profile_name>
+- To show account address:
+ 	aptos account lookup-address (Believe it is now b1c6f4d620cd47adc541e75285b76b09a3f87bd579cac3ec79f10b1eb9ef1f35)
+
+3) CREATE A NEW ACCOUNT (NEW ADDRESS)
+------------------------------------
+- Command:
+    aptos account create
+- Explanation:
+    Generates a new Aptos keypair and address. Saves credentials in the CLI config file.
+- Optional: create a named profile to manage multiple accounts:
+    aptos init --profile <profile_name>
+    aptos account create --profile <profile_name>
+
+4) FUND ACCOUNT USING FAUCET (TESTNET)
+--------------------------------------
+- Command:
+    aptos account fund-with-faucet --address <account_address> --amount <amount>
+- Explanation:
+    Requests APT from the official testnet faucet so the account can pay for gas.
+
+5) PUBLISH A MOVE MODULE
+------------------------
+- Prerequisites:
+    - Move package directory with a Move.toml
+    - A valid .move file with public entry functions or modules
+- Command:
+    aptos move publish --dev
+- Explanation:
+    Compiles and publishes the module(s) to the Aptos blockchain at your account's address.
+
+6) CALL AN ENTRY FUNCTION
+-------------------------
+- Syntax:
+    aptos move run --function-id <module_address>::<module_name>::<function_name> [--args <args>]
+- Example (no args):
+    aptos move run --function-id 0xYourAddress::my_module::initialize_pool
+- Example (with args):
+    aptos move run  --function-id 0xb1c6f4d620cd47adc541e75285b76b09a3f87bd579cac3ec79f10b1eb9ef1f35::message::set_message --args string:"Hello, Aptos!"
+- Explanation:
+    Calls a public entry function in a published Move module.
+
+7) VIEW ON APTOS EXPLORER
+-------------------------
+- URL:
+    https://explorer.aptoslabs.com/
+- Explanation:
+    - Search by account address to view transactions, modules, and resources on mainnet or testnet.
+
+8) DEBUGGING COMMON ERRORS
+--------------------------
+- "Simulation failed with status: LINKER_ERROR"
+  => The module may not be published, or the function ID is incorrect.
+- "Simulation failed with status: INVALID_MAIN_FUNCTION_SIGNATURE"
+  => The function is not declared as 'public entry' or its signature is invalid for external calls.
+- "ENO_MESSAGE" or "not_found"
+  => The resource or data doesn't exist on-chain (e.g., you tried to read a resource that isn’t published yet).
+
+9) MANAGING MULTIPLE PROFILES
+-----------------------------
+- Explanation:
+    You can have multiple profiles, each with its own keys/accounts.
+- Create a profile:
+    aptos init --profile <profile_name>
+- Use a profile:
+    aptos move publish --profile <profile_name> --package-dir <package_dir>
+    aptos move run --profile <profile_name> --function-id ...
+- Switch between profiles easily without overwriting existing credentials.
+
+
+
+========================================
+HOW TO PUBLISH A MOVE MODULE
+========================================
+
+1) PRE-REQUISITES
+-----------------
+- You have the Aptos CLI installed (via `aptos init`).
+- You have created or imported an Aptos account, which will hold the module.
+- You have a Move package structure with a `Move.toml` and `sources/` directory.
+
+2) PREPARE THE PACKAGE
+----------------------
+- Ensure your project folder contains:
+  - Move.toml
+  - A `sources` folder with your .move files
+- A typical project structure:
+    
+    my_move_project/
+    ├── Move.toml
+    └── sources/
+        └── message.move  (example)
+
+3) COMPILE (OPTIONAL STEP)
+--------------------------
+- You can compile the code locally to check for errors:
+  
+  aptos move compile --dev
+  
+- The CLI will produce a `build/` folder with compiled artifacts.
+
+4) PUBLISH THE MODULE
+---------------------
+- Command:
+
+  aptos move publish --dev
+  
+- Explanation:
+  - This command compiles (if needed) and publishes the module to the Aptos blockchain using the default account you initialized.
+  - If you have multiple profiles, specify one with `--profile <profile_name>`.
+  - If you’re publishing to a testnet or devnet, add `--network testnet` or `--network devnet`.
+
+Example:
+  aptos move publish \
+    --package-dir /path/to/my_move_project \
+    --profile test-profile \
+    --network testnet
+
+5) VERIFY PUBLISHED MODULE
+--------------------------
+- After publishing, you should see output indicating success.
+- To confirm, list modules at your address:
+
+  aptos account list --address 0xb1c6f4d620cd47adc541e75285b76b09a3f87bd579cac3ec79f10b1eb9ef1f35
+
+- Alternatively, check the Aptos Explorer (https://explorer.aptoslabs.com/) and search your address to see the newly published module.
+
+
+========================================
+END OF APTOS REFERENCE GUIDE
+========================================
