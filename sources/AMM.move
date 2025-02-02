@@ -17,7 +17,8 @@ module net2dev_addr::AMM{
     }
 
     struct AllTrades has drop, store, key, copy {
-        trades: vector<Trade>,
+        trades_A: vector<Trade>,
+        trades_B: vector<Trade>,
     }
 
     fun init_pool(account: &signer, amountA: u64, amountB: u64){
@@ -30,7 +31,7 @@ module net2dev_addr::AMM{
     }
 
     fun get_all_trades(account: address): vector<Trade> acquires AllTrades {
-        borrow_global_mut<AllTrades>(account).trades
+        borrow_global_mut<AllTrades>(account).trades_A
     }
     
 
@@ -86,7 +87,7 @@ module net2dev_addr::AMM{
         let trade2 = Trade{amount: 200, account: signer::address_of(&client2)};
         move_to(&client2, trade2);
 
-        let all_trades = AllTrades{trades: vector<Trade>[trade, trade2]};
+        let all_trades = AllTrades{trades_A: vector<Trade>[trade, trade2], trades_B: vector<Trade>[]};
         move_to(&amm_addr, all_trades);
 
         let trades = get_all_trades(signer::address_of(&amm_addr));
@@ -101,7 +102,7 @@ module net2dev_addr::AMM{
         let trade2 = Trade{amount: 200, account: signer::address_of(&client2)};
         move_to(&client2, trade2);
 
-        let all_trades = AllTrades{trades: vector<Trade>[trade, trade2]};
+        let all_trades = AllTrades{trades_A: vector<Trade>[trade, trade2], trades_B: vector<Trade>[]};
         move_to(&amm_addr, all_trades);
 
         let trades = get_all_trades(signer::address_of(&amm_addr));
@@ -135,7 +136,7 @@ module net2dev_addr::AMM{
         let trade2 = Trade{amount: 200, account: signer::address_of(&client2)};
         move_to(&client2, trade2);
 
-        let all_trades = AllTrades{trades: vector<Trade>[trade, trade2]};
+        let all_trades = AllTrades{trades_A: vector<Trade>[trade, trade2], trades_B: vector<Trade>[]};
         move_to(&amm_addr, all_trades);
 
         let trades = get_all_trades(signer::address_of(&amm_addr));
