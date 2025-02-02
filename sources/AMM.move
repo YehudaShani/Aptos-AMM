@@ -2,6 +2,9 @@ module net2dev_addr::AMM{
     //use std::string::{String, utf8};
     use std::debug::print;
     use std::signer;
+    use std::vector;
+
+    const CONST_PRODUCT: u64 = 10000;
 
     struct Pool has drop, store, key {
         amountA: u64,
@@ -35,6 +38,20 @@ module net2dev_addr::AMM{
         move_to(account, trade);
     }
 
+    fun calculate_exchange_rate(amountA: u64, amountB: u64): u64 {
+        10
+    }
+
+    fun sum_trades(trades: vector<Trade>, amount_trades: u64) {
+        let total_amount = 0;
+        for (i in 0..amount_trades) {
+            print(vector::borrow<Trade>(&trades, i));
+            total_amount = total_amount + vector::borrow<Trade>(&trades, i).amount;
+        };
+        print(&total_amount);
+    }
+    
+
 #[test(client1 = @0x123, client2 = @0x144)]
     fun test_trade(client1: signer, client2: signer) acquires Trade {
         let trade = Trade{amount: 100};
@@ -62,5 +79,21 @@ module net2dev_addr::AMM{
 
         let trades = get_all_trades(signer::address_of(&amm_addr));
         print(&trades);
+    }
+
+#[test(client1 = @0x123, client2 = @0x144, amm_addr = @0x155)]
+    fun test_calc_total_amounts(client1: signer, client2: signer, amm_addr: signer) acquires AllTrades {
+        let trade = Trade{amount: 100};
+        move_to(&client1, trade);
+
+        let trade2 = Trade{amount: 200};
+        move_to(&client2, trade2);
+
+        let all_trades = AllTrades{trades: vector<Trade>[trade, trade2]};
+        move_to(&amm_addr, all_trades);
+
+        let trades = get_all_trades(signer::address_of(&amm_addr));
+        let total_amount = 0;
+        sum_trades(trades, 2);
     }
 }
