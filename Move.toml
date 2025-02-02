@@ -1,14 +1,16 @@
 [package]
-name = "aptos_test"
-version = "0.0.0"
+name = "my-dapp"
+version = "1.0.0"
+authors = []
 
 [addresses]
-hello_blockchain = "_"
+net2dev_addr = "a29b957ed111749a3ad41f30c208661a1a592e5e1f9831757a04783eb7054d87"
 
 [dev-addresses]
-hello_blockchain = "0xb1c6f4d620cd47adc541e75285b76b09a3f87bd579cac3ec79f10b1eb9ef1f35"
 
 [dependencies.AptosFramework]
 git = "https://github.com/aptos-labs/aptos-framework.git"
-rev = "mainnet"
+rev = "aptos-release-v1.25"
 subdir = "aptos-framework"
+
+[dev-dependencies]
