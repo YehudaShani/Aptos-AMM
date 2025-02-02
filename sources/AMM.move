@@ -13,6 +13,7 @@ module net2dev_addr::AMM{
 
     struct Trade has drop, store, key, copy{
         amount: u64,
+        account: address,
     }
 
     struct AllTrades has drop, store, key, copy {
@@ -34,7 +35,7 @@ module net2dev_addr::AMM{
     
 
     fun add_trade(account: &signer, amount: u64){
-        let trade = Trade{amount: amount};
+        let trade = Trade{amount: amount, account: signer::address_of(account)};
         move_to(account, trade);
     }
 
@@ -63,13 +64,15 @@ module net2dev_addr::AMM{
 
 #[test(client1 = @0x123, client2 = @0x144)]
     fun test_trade(client1: signer, client2: signer) acquires Trade {
-        let trade = Trade{amount: 100};
+        let trade = Trade{amount: 100, account: signer::address_of(&client1)};
         move_to(&client1, trade);
+
         let amount = get_trade(signer::address_of(&client1));
         assert!(amount == 100, 100);
 
-        let trade2 = Trade{amount: 200};
-        move_to(&client2, trade2);
+        let trade = Trade{amount: 200, account: signer::address_of(&client2)};
+        move_to(&client2, trade);
+
         let amount2 = get_trade(signer::address_of(&client2));
         assert!(amount2 == 200, 200);
     }
@@ -77,10 +80,10 @@ module net2dev_addr::AMM{
 #[test(client1 = @0x123, client2 = @0x144, amm_addr = @0x155)]
     fun test_all_trades(client1: signer, client2: signer, amm_addr: signer) acquires AllTrades {
 
-        let trade = Trade{amount: 100};
+        let trade = Trade{amount: 100, account: signer::address_of(&client1)};
         move_to(&client1, trade);
 
-        let trade2 = Trade{amount: 200};
+        let trade2 = Trade{amount: 200, account: signer::address_of(&client2)};
         move_to(&client2, trade2);
 
         let all_trades = AllTrades{trades: vector<Trade>[trade, trade2]};
@@ -92,10 +95,10 @@ module net2dev_addr::AMM{
 
 #[test(client1 = @0x123, client2 = @0x144, amm_addr = @0x155)]
     fun test_sum_trades(client1: signer, client2: signer, amm_addr: signer) acquires AllTrades {
-        let trade = Trade{amount: 100};
+        let trade = Trade{amount: 100, account: signer::address_of(&client1)};
         move_to(&client1, trade);
 
-        let trade2 = Trade{amount: 200};
+        let trade2 = Trade{amount: 200, account: signer::address_of(&client2)};
         move_to(&client2, trade2);
 
         let all_trades = AllTrades{trades: vector<Trade>[trade, trade2]};
@@ -107,23 +110,6 @@ module net2dev_addr::AMM{
 
     }
 
-#[test(client1 = @0x123, client2 = @0x144, amm_addr = @0x155)]
-    fun test_calculate_exchange_rate(client1: signer, client2: signer, amm_addr: signer) acquires AllTrades {
-        let trade = Trade{amount: 100};
-        move_to(&client1, trade);
-
-        let trade2 = Trade{amount: 200};
-        move_to(&client2, trade2);
-
-        let all_trades = AllTrades{trades: vector<Trade>[trade, trade2]};
-        move_to(&amm_addr, all_trades);
-
-        let trades = get_all_trades(signer::address_of(&amm_addr));
-        let total_amount = 0;
-        sum_trades(trades, 2);
-        let exchange_rate = calculate_exchange_rate(100, 200);
-        print(&exchange_rate);
-    }
 
 #[test(client1 = @0x123, client2 = @0x144, amm_addr = @0x155)]
     fun test_add_money_to_pool(client1: signer, client2: signer, amm_addr: signer) acquires Pool {
@@ -141,4 +127,21 @@ module net2dev_addr::AMM{
         assert!(total_b == 100, 100);
     }
 
+#[test(client1 = @0x123, client2 = @0x144, amm_addr = @0x155)]
+    fun test_calculate_exchange_rate(client1: signer, client2: signer, amm_addr: signer) acquires AllTrades {
+        let trade = Trade{amount: 100, account: signer::address_of(&client1)};
+        move_to(&client1, trade);
+
+        let trade2 = Trade{amount: 200, account: signer::address_of(&client2)};
+        move_to(&client2, trade2);
+
+        let all_trades = AllTrades{trades: vector<Trade>[trade, trade2]};
+        move_to(&amm_addr, all_trades);
+
+        let trades = get_all_trades(signer::address_of(&amm_addr));
+        let total_amount = 0;
+        sum_trades(trades, 2);
+        let exchange_rate = calculate_exchange_rate(100, 200);
+        print(&exchange_rate);
+    }
 }
